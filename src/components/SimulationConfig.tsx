@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,7 @@ import { Simulation, Service, Environment } from '@/types/simulation';
 import { useSimulationStore } from '@/stores/simulationStore';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface SimulationConfigProps {
   open: boolean;
@@ -23,8 +24,16 @@ interface SimulationConfigProps {
 
 export const SimulationConfig = ({ open, onOpenChange, onSave }: SimulationConfigProps) => {
   const { simulation, environment, setSimulation, setEnvironment } = useSimulationStore();
-  const [localSim, setLocalSim] = useState<Simulation | null>(simulation);
+  const [localSim, setLocalSim] = useState<Simulation | null>(null);
   const [localEnv, setLocalEnv] = useState<Environment>(environment);
+
+  // Initialize local state when dialog opens
+  React.useEffect(() => {
+    if (open && simulation) {
+      setLocalSim(simulation);
+      setLocalEnv(environment);
+    }
+  }, [open, simulation, environment]);
 
   const handleSave = () => {
     if (localSim) {
@@ -39,6 +48,40 @@ export const SimulationConfig = ({ open, onOpenChange, onSave }: SimulationConfi
     if (!localSim) return;
     const newServices = [...localSim.business.services];
     newServices[index] = { ...newServices[index], ...updates };
+    setLocalSim({
+      ...localSim,
+      business: { ...localSim.business, services: newServices }
+    });
+  };
+
+  const addService = () => {
+    if (!localSim) return;
+    const newService: Service = {
+      id: localSim.business.services.length,
+      name: 'New Service',
+      price: 100,
+      cost: 50,
+      satisfactionRate: 0.7,
+      targetAudience: {
+        name: 'general',
+        minAge: 18,
+        maxAge: 60,
+        maleInterest: 0.5,
+        femaleInterest: 0.5
+      }
+    };
+    setLocalSim({
+      ...localSim,
+      business: {
+        ...localSim.business,
+        services: [...localSim.business.services, newService]
+      }
+    });
+  };
+
+  const removeService = (index: number) => {
+    if (!localSim) return;
+    const newServices = localSim.business.services.filter((_, i) => i !== index);
     setLocalSim({
       ...localSim,
       business: { ...localSim.business, services: newServices }
@@ -88,9 +131,35 @@ export const SimulationConfig = ({ open, onOpenChange, onSave }: SimulationConfi
           </TabsContent>
 
           <TabsContent value="services" className="space-y-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Services Configuration</h3>
+              <Button 
+                onClick={addService}
+                size="sm"
+                variant="outline"
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Service
+              </Button>
+            </div>
             {localSim?.business.services.map((service, index) => (
-              <Card key={service.id} className="p-4 bg-secondary border-border">
-                <h4 className="font-semibold mb-3">{service.name}</h4>
+              <Card key={index} className="p-4 bg-secondary border-border">
+                <div className="flex justify-between items-start mb-3">
+                  <Input
+                    value={service.name}
+                    onChange={(e) => updateService(index, { name: e.target.value })}
+                    className="font-semibold bg-background border-border max-w-[200px]"
+                  />
+                  <Button
+                    onClick={() => removeService(index)}
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Price</Label>
@@ -129,6 +198,15 @@ export const SimulationConfig = ({ open, onOpenChange, onSave }: SimulationConfi
                 </div>
               </Card>
             ))}
+            {(!localSim?.business.services || localSim.business.services.length === 0) && (
+              <Card className="p-8 bg-secondary/50 border-border text-center">
+                <p className="text-muted-foreground mb-4">No services configured yet</p>
+                <Button onClick={addService} variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Service
+                </Button>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="environment" className="space-y-4">

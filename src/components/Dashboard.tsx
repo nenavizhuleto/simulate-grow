@@ -4,6 +4,7 @@ import { useSimulationStore } from '@/stores/simulationStore';
 import { SimulationControls } from './SimulationControls';
 import { MetricsChart } from './MetricsChart';
 import { MetricsCards } from './MetricsCards';
+import { BusinessMetrics } from './BusinessMetrics';
 import { SimulationConfig } from './SimulationConfig';
 import { ConnectionStatus } from './ConnectionStatus';
 import { OutputMessage, StepMetrics } from '@/types/simulation';
@@ -194,6 +195,9 @@ export const Dashboard = () => {
 
         {/* Chart */}
         {metrics.length > 0 && <MetricsChart metrics={metrics} />}
+
+        {/* Business Metrics */}
+        <BusinessMetrics metrics={metrics} />
 
         {/* Configuration Dialog */}
         <SimulationConfig
