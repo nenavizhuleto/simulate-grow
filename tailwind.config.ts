@@ -57,6 +57,24 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        metric: {
+          growth: "hsl(var(--metric-growth))",
+          churn: "hsl(var(--metric-churn))",
+          organic: "hsl(var(--metric-organic))",
+          attracted: "hsl(var(--metric-attracted))",
+          returned: "hsl(var(--metric-returned))",
+        },
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-accent': 'var(--gradient-accent)',
+        'gradient-success': 'var(--gradient-success)',
+        'gradient-danger': 'var(--gradient-danger)',
+        'gradient-card': 'var(--gradient-card)',
+      },
+      boxShadow: {
+        'glow': 'var(--shadow-glow)',
+        'card': 'var(--shadow-card)',
       },
       borderRadius: {
         lg: "var(--radius)",
